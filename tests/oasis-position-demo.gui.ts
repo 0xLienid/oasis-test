@@ -22,6 +22,29 @@ test.describe("Oasis Demo", () => {
             }
         });
 
+        page.route("http://127.0.0.1:8545", async (route, request) => {
+            if (request.method() === "POST") {
+                const data = JSON.parse(request.postData() as string);
+
+                if (data.method === "eth_estimateGas") {
+                    const resultData = {
+                        "jsonrpc": "2.0",
+                        "id": data.id,
+                        "result": "0x989680"
+                    }
+
+                    route.fulfill({
+                        contentType: "application/json",
+                        body: JSON.stringify(resultData)
+                    });
+                } else {
+                    route.continue();
+                }
+            } else {
+                route.continue();
+            }
+        });
+
         // Initialize fork
         await gui.initializeChain(1, 17444453);
 
